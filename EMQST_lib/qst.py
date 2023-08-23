@@ -237,14 +237,18 @@ class QST():
             perturbed_state=a*purified_state + b*(g-purified_state*(purified_state.conj()@g))/np.linalg.norm(g-purified_state*(purified_state.conj()@g))
 
             # Take partial trace and compute likelihood
-            purified_density=np.outer(perturbed_state,perturbed_state.conj())
+            #purified_density=np.outer(perturbed_state,perturbed_state.conj())
             # Reshaping groups qubits on the form rho_{a_1,b_1,a_2,b_2} where a is the physical qubit and b is ancilla
             # This generalizes to n qubit case by rho_{a_1,a_2,b_1,b_2,â_1,â_2,b^_1,b^_2}
             #                                    =rho_{a',b',â',b^'} where primed now counts to 4 insted of binary.
-            purified_density=np.reshape(purified_density,(2*n_qubits,2*n_qubits,2*n_qubits,2*n_qubits)) 
-            perturbed_rho=np.trace(purified_density,axis1=1,axis2=3)
-            temp_likelihood=logLikelihood(perturbed_rho,full_operator_list,index_counts,index_values)
+            #purified_density=np.reshape(purified_density,(2*n_qubits,2*n_qubits,2*n_qubits,2*n_qubits)) 
+            #perturbed_rho=np.trace(purified_density,axis1=1,axis2=3)
+            
 
+            reshaped_state = np.reshape(perturbed_state, (2*n_qubits, 2*n_qubits))
+            perturbed_rho = reshaped_state @ reshaped_state.conj().T
+            #print(np.allclose(perturbed_rho2,perturbed_rho))
+            temp_likelihood=logLikelihood(perturbed_rho,full_operator_list,index_counts,index_values)
             # Check if the MH step should be accepted
             ratio=np.exp(temp_likelihood - base_likelihood)
             r=np.random.random()

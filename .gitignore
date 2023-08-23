@@ -1,6 +1,7 @@
 .EMQST/
 results/
 profiler/
+EMQST_lib/__pycache__
 latest_run.png
 test_notebook.ipynb
 # Byte-compiled / optimized / DLL files
