@@ -13,7 +13,7 @@ import sys
 import EMQST_lib.support_functions as sf
 from EMQST_lib import measurement_functions as mf
 from EMQST_lib.povm import POVM
-
+from EMQST_lib import povm
 
 class QST():
     """
@@ -90,6 +90,7 @@ class QST():
         Returns an QST object initialized with data and setting from previous run. 
         Results such as infidelity and rho_estm will be found in QST_results.npy.
         """
+        
         with open(f'{base_path}QST_settings.npy','rb') as f:
             qst_dict=np.load(f,allow_pickle=True).item()
 
@@ -175,14 +176,14 @@ class QST():
                    rho_bank, weights=QST.resampling(self.n_qubits,rho_bank,weights,outcome_index[j,:k],full_operator_list,self.n_cores,self.__MH_steps)
                 self.infidelity[j,k]=1-np.real(np.einsum('ij,kji,k->',self.true_state_list[j],rho_bank,weights))
                 # Compute averag bures distance of distribution
-                if k%1000==0:
-                    self.uncertainty[j,k]=average_Bures(rho_bank,weights,self.n_qubits)
+                #if k%1000==0:
+                #    self.uncertainty[j,k]=average_Bures(rho_bank,weights,self.n_qubits)
             self.rho_estimate[j]=np.array(np.einsum('ijk,i->jk',rho_bank,weights))
             print(f'Completed run {j+1}/{self.n_averages}. Final infidelity: {self.infidelity[j,-1]}.')
     
     def weight_update(weights,rho_bank,measurement_operator):
-        conditional_probability=np.einsum('kj,ijk->i',measurement_operator,rho_bank)
-        return np.real(conditional_probability*weights/np.dot(conditional_probability,weights))    
+        conditional_probability=np.einsum('kj,ijk->i',measurement_operator,rho_bank,optimize=False) # Optimizing this einsum is not worth it!
+        return np.real(conditional_probability*weights/np.dot(conditional_probability,weights))
     
 
     def resampling(n_qubits,rho_bank,weights,outcome_index,full_operator_list,n_cores,MH_steps):
@@ -190,7 +191,7 @@ class QST():
         # Calculate the cumulative probabilites for easy sampling
         cumulative_sum=np.cumsum(weights)
         # Calculate the kick strenght based on the bures variance of the distribution
-        likelihood_variance=np.sqrt(np.real(average_Bures(rho_bank,weights,n_qubits)))
+        likelihood_variance=np.sqrt(np.real(average_Bures(rho_bank,weights,n_qubits,n_cores)))
         if n_qubits==2:
             likelihood_variance*=0.1
         elif n_qubits==1:
@@ -290,10 +291,10 @@ def purity(rhos: np.array, prec=1e-15):
     else:
         return False
 
-def average_Bures(rho_bank,weights,n_qubits): 
+def average_Bures(rho_bank,weights,n_qubits,n_cores): 
     """
     Computes the average Bures distance of the current bank. 
-    Current impementation uses the Qutip implementation of fidelity. 
+    Current 2+ qubit impementation uses the Qutip fidelity function. 
     """
     mean_state=np.array(np.einsum('ijk,i->jk',rho_bank,weights))
     b=0
@@ -302,12 +303,16 @@ def average_Bures(rho_bank,weights,n_qubits):
         for i in range(len(rho_bank)):
             infid=one_qubit_infidelity(rho_bank[i],mean_state)
             b+=2*(infid)*weights[i]
-    else: # 2 Qubit case is much slower
-        for i in range(len(rho_bank)):
-            fid=qt.fidelity(qt.Qobj(rho_bank[i]),qt.Qobj(mean_state))
-            b+=2*(1-np.real(fid))*weights[i]
-    
+    else: # 2 Qubit case is much slower, NEW: parallelized fidelity computation. 
+        fid=Parallel(n_jobs=n_cores)(delayed(parallel_Bures)(rho,mean_state) for rho in rho_bank)
+        b=np.einsum('i,i->',2*(1-np.real(fid)),weights)
+
     return b
+
+def parallel_Bures(rho,mean_state):
+    fid=qt.fidelity(qt.Qobj(rho),qt.Qobj(mean_state))
+    return fid
+
 
 def logLikelihood(rho,full_operator_list,index_counts,index_values): 
     """

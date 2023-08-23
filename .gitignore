@@ -1,6 +1,8 @@
 .EMQST/
 results/
+profiler/
 latest_run.png
+test_notebook.ipynb
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

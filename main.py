@@ -6,11 +6,13 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 from scipy.linalg import sqrtm
+import cProfile, pstats
+import re
+
 import scipy
 import sys
 import os
 import uuid
-#sys.path.append("../")
 from EMQST_lib import unit_test as ut
 from EMQST_lib import support_functions as sf
 from EMQST_lib import emqst
@@ -28,10 +30,10 @@ def main():
         print("We are NOT on the cluster!")
         boolOnCluster=False
 
-    #np.random.seed(0)
+    np.random.seed(0)
 
-    n_qubits=1
-    n_QST_shots=int(10**4/3)+2
+    n_qubits=2
+    n_QST_shots=int(10**4)+2
     n_calibration_shots=10**4
     n_cores=4
     if boolOnCluster:
@@ -43,7 +45,7 @@ def main():
     # 3: Amplitude damping
     # 4: Constant rotation around x-axis
 
-    n_averages=3
+    n_averages=1
     exp_dictionary={}
     list_of_true_angles=np.array([[np.pi/2,0],[np.pi/2,np.pi],
                         [np.pi/2,np.pi/2],[np.pi/2,3*np.pi/2],
@@ -75,6 +77,27 @@ def main2():
     
     return 1
 
+def profiler():
+    profiler = cProfile.Profile()
+    profiler.enable()
+    main()
+    profiler.disable()
+    #stats = pstats.Stats(profiler).sort_stats('cumtime')
+    #stats.print_stats()
+    #stats.dump_stats('profiler/export-data.txt')
+    now=datetime.now()
+    now_string = now.strftime("%Y-%m-%d_%H-%M-%S_")
+    string_name= now_string+str(uuid.uuid4())
+    with open(f'profiler\profiling_{string_name}.txt', "w") as f:
+        ps = pstats.Stats(profiler, stream=f)
+        
+        ps.strip_dirs()
+        ps.sort_stats('cumulative')
+        ps.print_stats()
+    #cProfile.run('main()') 
+
 if __name__=="__main__":
     #main2()
-    main()
+    #main
+    profiler()
+    
