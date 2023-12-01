@@ -2,7 +2,7 @@
 .EMQST/
 results/
 profiler/
-EMQST_lib/__pycache__
+EMQST_lib/__pycache__/
 latest_run.png
 test.py
 
