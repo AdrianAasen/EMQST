@@ -1,9 +1,11 @@
+.venv/
 .EMQST/
 results/
 profiler/
 EMQST_lib/__pycache__
 latest_run.png
-test_notebook.ipynb
+test.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -54,30 +56,3 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
-
-
-__pycache__/ABQT_functions.cpython-310.pyc
-latest_run.png
-InfidelityTest.png
-ABQT.code-workspace
-.vscode/settings.json
-ABQT/RL_data/2dc8725c-c0b9-484d-bcf9-fa3153472cb7.csv
-ABQT/RL_data/2f54f79a-0f0e-4cca-b155-4133f0d02005.csv
-ABQT/RL_data/3b55d57c-2ec6-4338-8abe-ce2516def11a.csv
-ABQT/RL_data/6f5748dd-7161-473c-88e8-27dd2e7b6f57.csv
-ABQT/RL_data/9a17b812-d014-4050-ad54-d8bad82607d2.csv
-ABQT/RL_data/9cf54b18-dc87-4dd6-b4e9-8d58bd394f00.csv
-ABQT/RL_data/879e0736-ea69-4ef9-8cd2-944081f9356d.csv
-ABQT/RL_data/2818f7a9-7654-44fc-bb01-c42c0ad97da8.csv
-ABQT/RL_data/7196b0be-303c-4312-abef-2d2b88e951f2.csv
-ABQT/RL_data/7743b309-7582-457e-9c3a-3744cb60fb54.csv
-ABQT/RL_data/b7cd4b7a-232b-4637-82bd-805a8839df64.csv
-ABQT/RL_data/bd341c88-7627-4c38-8f53-24c766f56709.csv
-ABQT/RL_data/c41e3728-54a6-408d-a778-0b6d686a46c2.csv
-ABQT/RL_data/c74ec082-953a-4b28-8e6e-34e03ec187a7.csv
-ABQT/RL_data/c27092f6-111b-43ca-9fe6-f30d615bd5ae.csv
-ABQT/RL_data/cf69b3db-e6e7-45ae-9629-3b9307a88536.csv
-ABQT/RL_data/ed3d3e17-c1b8-4765-b935-9e4e1c8c17b2.csv
-ABQT/RL_data/f91b49a5-4239-40dc-a41b-974c26d5549d.csv
-ABQT/RL_data/f5661407-bfe4-4517-a6f5-be997806a97b.csv
-ABQT/RL_data/fd9c2c0e-a892-4288-8fe7-9ed789ae7510.csv
