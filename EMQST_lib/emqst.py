@@ -24,7 +24,9 @@ def emqst(n_qubits,n_QST_shots_each,n_calibraion_shots_each,true_state_list, cal
     trueAngleList           List of random true states to average over.
     POVMCalibrationAngles   Angles used for calibrating the POVM, should be 3 MUBs.
 
-    returns a list of mean corrected infidelities [len(TrueAngleList) x n_QST_shots_total],  list of uncorrected infidelities, corrected_rho_estm
+    returns a list of mean corrected infidelities [len(TrueAngleList) x n_QST_shots_total],
+                    list of uncorrected infidelities,
+                    complex list of corrected_rho_estm [len(TrueAngleList) x 2 x 2 ]
     """
 
     
@@ -130,6 +132,8 @@ def emqst(n_qubits,n_QST_shots_each,n_calibraion_shots_each,true_state_list, cal
         np.save(f,corrected_rho_estm)
         np.save(f,uncorrected_rho_estm)
 
+    
+    # Generate plots if not run on a cluster.
     if n_cores<10:
         cutoff=10
         popt_corr,pcov_corr=curve_fit(sf.power_law,sample_step[1000:],corrected_average[1000:],p0=np.array([1,-0.5]))
